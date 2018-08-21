@@ -225,7 +225,7 @@ class EditInPlaceFieldReferenceWithParentFormatter extends EntityReferenceLabelF
           '#entity_id' => $items->getEntity()->id(),
           '#lang_code' => $items->getEntity()->language()->getId(),
         ],
-        'form_container' => $this->formBuilder->getForm('Drupal\edit_in_place_field\Form\EditInPlaceReferenceWithParentFieldReferenceForm', [
+        'form_container' => $this->formBuilder->getForm('Drupal\edit_in_place_field\Form\EditInPlaceReferenceWithParentForm', [
           'choice_lists' => $choice_lists,
           'parent_labels' => $parent_labels,
           'selected' => $selected,
