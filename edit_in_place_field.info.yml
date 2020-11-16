@@ -2,4 +2,5 @@ name: Edit in place field
 type: module
 description: Add a edit in place options on each field it's applied
 core: 8.x
+core_version_requirement: ^8 || ^9
 package: Fields
