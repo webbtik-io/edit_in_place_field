@@ -1,7 +1,9 @@
 fieldset:not(.fieldgroup).edit-in-place-clickable {
   border-radius: 10px;
-  padding: 20px 0px 0px;
+  padding: 0px 0px 0px;
   min-height: 9px;
+  border: 1px dashed #c0c0c0;
+  cursor: pointer;
 }
 
 fieldset:not(.fieldgroup) form {
@@ -9,11 +11,8 @@ fieldset:not(.fieldgroup) form {
 }
 
 fieldset:not(.fieldgroup).edit-in-place-clickable legend {
-  bottom: 0;
-  right: 5px;
-  top: 5px;
-  text-transform: none;
-  cursor: pointer;
+  display: none;
+
 }
 
 fieldset:not(.fieldgroup).edit-in-place-clickable-init  legend + .fieldset-wrapper .form-item {
@@ -24,19 +23,28 @@ fieldset:not(.fieldgroup).edit-in-place-clickable .fieldgroup input {
   float: right;
 }
 
-fieldset:not(.edit-in-place-clickable-init) .fieldset-wrapper .entity-label {
+fieldset:not(.edit-in-place-clickable-init) .fieldset-wrapper .edit-in-place-editable {
   display: none;
 }
 
-fieldset:not(.fieldgroup).edit-in-place-clickable .entity-label {
-  width: 300px;
+fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable {
+  width: auto;
+  min-height: 23px;
 }
 
-fieldset:not(.fieldgroup).edit-in-place-clickable .entity-label ul {
-  margin: 0;
+fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable ul {
+  margin: 3px;
+  padding-inline-start: 20px;
 }
 
-fieldset:not(.fieldgroup).edit-in-place-clickable .entity-label .edit-in-place--group:not(.last-group) {
+fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable div,
+fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable ol,
+fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable ul {
+  white-space: nowrap;
+  min-width: 150px;
+}
+
+fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable .edit-in-place--group:not(.last-group) {
   border-bottom: 1px dashed;
 }
 

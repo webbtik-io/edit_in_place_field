@@ -33,11 +33,6 @@ function edit_in_place_field_theme($existing, $type, $theme, $path) {
       'render element' => 'requirements',
       'variables' => [
         'labels' => NULL,
-        'entities' => NULL,
-        'entity_type' => NULL,
-        'field_name' => NULL,
-        'entity_id' => NULL,
-        'lang_code' => NULL,
       ]
     ],
     'edit_in_place_reference_with_parent_label' => [
@@ -50,6 +45,14 @@ function edit_in_place_field_theme($existing, $type, $theme, $path) {
         'entity_id' => NULL,
         'lang_code' => NULL,
       ]
-    ]
+    ],
+    'edit_in_place_string_values' => [
+      'template' => 'edit-in-place-string-values',
+      'render element' => 'requirements',
+      'variables' => [
+        'values' => NULL,
+        'multiple' => FALSE
+      ]
+    ],
   );
 }

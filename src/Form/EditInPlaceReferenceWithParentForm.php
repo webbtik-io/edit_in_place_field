@@ -2,10 +2,9 @@
 
 namespace Drupal\edit_in_place_field\Form;
 
-use Drupal\Core\Ajax\InsertCommand;
+use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityStorageException;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\edit_in_place_field\Ajax\RebindJSCommand;
 
 /**
  * Class EditInPlaceReferenceWithParentForm.
@@ -36,18 +35,26 @@ class EditInPlaceReferenceWithParentForm extends EditInPlaceFieldReferenceForm {
   /**
    * {@inheritdoc}
    */
-  protected function getInPlaceField ($data) {
+  protected function getInPlaceField(array $data): array {
     $choice_fields = [];
+    $multiple = ($data['cardinality'] !== 1);
+    $type = 'select';
+    $moduleHandler = \Drupal::service('module_handler');
+    if ($moduleHandler->moduleExists('select2')) {
+      $type = 'select2';
+    }
     foreach($data['choice_lists'] as $parent_id => $choices) {
       $choice_fields['in_place_field'.$parent_id] = [
         '#title' => isset($data['parent_labels'][$parent_id])?$data['parent_labels'][$parent_id]:'',
-        '#type' => 'edit_in_place_field_select',
+        '#type' => $type,
         '#options' => $choices,
         '#value' => isset($data['selected'][$parent_id])?$data['selected'][$parent_id]['ids']:[],
-        '#name' => 'in_place_field'.$parent_id.'[]',
+        '#name' => 'in_place_field'.$parent_id,
         '#attributes' => [
-          'multiple' => ($data['cardinality'] !== 1)?TRUE:FALSE,
+          'multiple' => $multiple,
+          'class' => ['edit-in-place'],
         ],
+        '#multiple' => $multiple
       ];
     }
     return $choice_fields;
@@ -56,79 +63,29 @@ class EditInPlaceReferenceWithParentForm extends EditInPlaceFieldReferenceForm {
   /**
    * {@inheritdoc}
    */
-  protected function processRequest() {
-    // Get data from ajax request.
-    $field_name = \Drupal::requestStack()->getCurrentRequest()->get('field_name');
-    $entity_type = \Drupal::requestStack()->getCurrentRequest()->get('entity_type');
-    $entity_id = \Drupal::requestStack()->getCurrentRequest()->get('entity_id');
-    $ajax_replace = \Drupal::requestStack()->getCurrentRequest()->get('ajax_replace');
-    $parent_ids = \Drupal::requestStack()->getCurrentRequest()->get('parent_ids');
-    $label_substitution = \Drupal::requestStack()->getCurrentRequest()->get('label_substitution');
-    $parent_ids = explode(', ', $parent_ids);
-
-    // Retrieve the selected values.
-    $field_values = [];
-    foreach($parent_ids as $parent_id) {
-      $field_values = array_merge($field_values, \Drupal::requestStack()->getCurrentRequest()->get('in_place_field'.$parent_id, []));
-    }
-    // Get the current langcode.
-    $replace_data = explode('-', $ajax_replace);
-    $entity_langcode = end($replace_data);
-
-    return [
-      'field_name' => $field_name,
-      'entity_type' => $entity_type,
-      'entity_id' => $entity_id,
-      'ajax_replace' => $ajax_replace,
-      'field_values' => $field_values,
-      'entity_langcode' => $entity_langcode,
-      'label_substitution' => $label_substitution,
-    ];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  protected function processResponse($data) {
-    $field_name = $data['field_name'];
-    $entity_type = $data['entity_type'];
-    $entity_id = $data['entity_id'];
-    $ajax_replace = $data['ajax_replace'];
-    $field_values = $data['field_values'];
-    $entity_langcode = $data['entity_langcode'];
-    $label_substitution = $data['label_substitution'];
+  protected function processResponse(array $data): AjaxResponse {
+    $field_name = $data[self::VAR_FIELD_NAME];
+    $label_substitution = $data[self::VAR_LABEL_SUBSTITUTION];
 
     $selected_entities = [];
-    if (empty($field_name) || empty($entity_type) || empty($entity_id)) {
-      return $this->getResponse(parent::ERROR_INVALID_DATA, [
-        'field_name' => $field_name,
-        'entity_type' => $entity_type,
-        'entity_id' => $entity_id,
-      ]);
-    }
 
-    $entity = $this->entityTypeManager->getStorage($entity_type)->load($entity_id);
-    try {
-      $entity = $entity->getTranslation($entity_langcode);
-    }catch(\Exception $e){}
-
+    // Try to load the entity to update.
+    $error_response = new AjaxResponse();
+    $entity = $this->loadEntity($data, $error_response);
     if (empty($entity)) {
-      return $this->getResponse(parent::ERROR_ENTITY_CANNOT_BE_LOADED, [
-        'entity_type' => $entity_type,
-        'entity_id' => $entity_id,
-      ]);
+      return $error_response;
     }
 
     try {
       // Save field data.
-      $entity->{$field_name} = $field_values;
+      $entity->{$field_name} = $data[self::VAR_FIELD_VALUES];
       $entity->save();
 
       // Retrieve data to be pass to the template.
       foreach($entity->{$field_name} as $field_data) {
         $child_entity = $field_data->entity;
         try {
-          $child_entity = $child_entity->getTranslation($entity_langcode);
+          $child_entity = $child_entity->getTranslation($data[self::VAR_ENTITY_LANG_CODE]);
         }catch(\Exception $e){}
         $parent_id = $child_entity->get('parent')->target_id;
         $selected_entities[$parent_id]['ids'][] = $child_entity->id();
@@ -147,21 +104,14 @@ class EditInPlaceReferenceWithParentForm extends EditInPlaceFieldReferenceForm {
     // Render entities labels.
     $labels_html = \Drupal::theme()->render('edit_in_place_reference_with_parent_label', [
       'entities' => $selected_entities,
-      'entity_type' => $entity_type,
+      'entity_type' => $data[self::VAR_ENTITY_TYPE],
       'field_name' => $field_name,
-      'entity_id' => $entity_id,
-      'lang_code' => $entity_langcode,
+      'entity_id' => $data[self::VAR_ENTITY_ID],
+      'lang_code' => $data[self::VAR_ENTITY_LANG_CODE],
     ]);
 
-    // Prepare response.
-    $response = $this->getResponse();
-
-    // Labels replacement.
-    $response->addCommand(new InsertCommand('.'.$ajax_replace.' .fieldset-wrapper .entity-label', $labels_html));
-
-    // Bind JavaScript events after html replacement from ajax call.
-    $response->addCommand(new RebindJSCommand('rebindJS', '.'.$ajax_replace));
-    return $response;
+    // Return ajax response.
+    return $this->reloadAndRebind($data[self::VAR_AJAX_REPLACE_ID], $labels_html);
   }
 
 }
