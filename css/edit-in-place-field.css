@@ -1,4 +1,4 @@
-fieldset:not(.fieldgroup).edit-in-place-clickable {
+fieldset.edit-in-place-clickable.form-item {
   border-radius: 10px;
   padding: 0px 0px 0px;
   min-height: 9px;
@@ -6,45 +6,47 @@ fieldset:not(.fieldgroup).edit-in-place-clickable {
   cursor: pointer;
 }
 
-fieldset:not(.fieldgroup) form {
+fieldset.edit-in-place-clickable.form-item form {
   padding: 0 10px;
 }
 
-fieldset:not(.fieldgroup).edit-in-place-clickable legend {
+fieldset.edit-in-place-clickable.form-item legend {
   display: none;
 
 }
 
-fieldset:not(.fieldgroup).edit-in-place-clickable-init  legend + .fieldset-wrapper .form-item {
+fieldset.edit-in-place-clickable.edit-in-place-clickable-init  legend + .fieldset__wrapper .form-item,
+fieldset.edit-in-place-clickable.edit-in-place-clickable-init  legend + .fieldset-wrapper .form-item {
   display: none;
 }
 
-fieldset:not(.fieldgroup).edit-in-place-clickable .fieldgroup input {
+fieldset.edit-in-place-clickable.form-item .fieldgroup input {
   float: right;
 }
 
-fieldset:not(.edit-in-place-clickable-init) .fieldset-wrapper .edit-in-place-editable {
+fieldset:not(.edit-in-place-clickable-init).form-item .fieldset__wrapper .edit-in-place-editable,
+fieldset:not(.edit-in-place-clickable-init).form-item .fieldset-wrapper .edit-in-place-editable {
   display: none;
 }
 
-fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable {
+fieldset.edit-in-place-clickable.form-item .edit-in-place-editable {
   width: auto;
   min-height: 23px;
 }
 
-fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable ul {
+fieldset.edit-in-place-clickable.form-item .edit-in-place-editable ul {
   margin: 3px;
   padding-inline-start: 20px;
 }
 
-fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable div,
-fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable ol,
-fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable ul {
+fieldset.edit-in-place-clickable.form-item .edit-in-place-editable div,
+fieldset.edit-in-place-clickable.form-item .edit-in-place-editable ol,
+fieldset.edit-in-place-clickable.form-item .edit-in-place-editable ul {
   white-space: nowrap;
   min-width: 150px;
 }
 
-fieldset:not(.fieldgroup).edit-in-place-clickable .edit-in-place-editable .edit-in-place--group:not(.last-group) {
+fieldset.edit-in-place-clickable.form-item .edit-in-place-editable .edit-in-place--group:not(.last-group) {
   border-bottom: 1px dashed;
 }
 

@@ -330,7 +330,7 @@ abstract class EditInPlaceFormBase extends FormBase {
     $response = $this->getResponse();
 
     // Values replacement.
-    $response->addCommand(new InsertCommand('.'.$ajax_replace.' .fieldset-wrapper .edit-in-place-editable', $html));
+    $response->addCommand(new InsertCommand('.'.$ajax_replace.' .edit-in-place-editable', $html));
 
     // Bind JavaScript events after html replacement from ajax call.
     $response->addCommand(new RebindJSCommand('rebindJS', '.'.$ajax_replace));
