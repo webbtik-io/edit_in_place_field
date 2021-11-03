@@ -3,7 +3,7 @@
 namespace Drupal\edit_in_place_field\Plugin\Field\FieldFormatter;
 
 use Drupal\Core\Field\FieldDefinitionInterface;
-use Drupal\Core\Field\Plugin\Field\FieldFormatter\StringFormatter;
+use Drupal\Core\Field\Plugin\Field\FieldFormatter\BasicStringFormatter;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -11,18 +11,18 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormBuilderInterface;
 
 /**
- * Plugin implementation of the 'edit_in_place_field_text' formatter.
+ * Plugin implementation of the 'edit_in_place_field_long_text' formatter.
  *
  * @FieldFormatter(
- *   id = "edit_in_place_field_text",
+ *   id = "edit_in_place_field_long_text",
  *   label = @Translation("Edit in place"),
  *   field_types = {
- *     "string",
- *     "uri",
+ *     "string_long",
+ *     "email",
  *   }
  * )
  */
-class EditInPlaceTextFormatter extends StringFormatter implements ContainerFactoryPluginInterface{
+class EditInPlaceLongTextFormatter extends BasicStringFormatter implements ContainerFactoryPluginInterface{
 
   /**
    * Cache about list of entities.
@@ -83,37 +83,12 @@ class EditInPlaceTextFormatter extends StringFormatter implements ContainerFacto
       // Get cardinality of current field.
       $cardinality = $items->getFieldDefinition()->getFieldStorageDefinition()->getCardinality();
 
-
-      // Check link to entity in settings.
-      $url = '';
-      $entity = $items->getEntity();
-      $entity_type = $entity->getEntityType();
-      if ($this->getSetting('link_to_entity') && !$entity->isNew() && $entity_type->hasLinkTemplate('canonical')) {
-        $url = $this->getEntityUrl($entity);
-      }
-
-      // Render HTML elements.
-      $render_elements = [];
-      foreach($items as $delta => $item) {
-        $view_value = $this->viewValue($item);
-        $field_values[] = $item->getValue();
-
-//        if (!empty($url)) {
-//          $render_elements[$delta] = [
-//          '#prefix' => '<div class="edit-in-place-editable string field-value" >',
-//          '#type' => 'link',
-//          '#title' => $view_value,
-//          '#url' => $url,
-//          '#suffix' => '</div>'
-//        ];
-//        }
-//        else {
-          $render_elements[] = [
-            '#theme' => 'edit_in_place_string_values',
-            '#multiple' => ($cardinality !== 1),
-            '#values' => array_column($field_values, 'value'),
-          ];
-//        }
+      /**
+       * @var string $delta
+       * @var \Drupal\Core\Field\Plugin\Field\FieldType\StringItem $entity
+       */
+      foreach($items as $delta => $entity) {
+        $field_values[] = $entity->getValue();
       }
     }
 
@@ -130,8 +105,12 @@ class EditInPlaceTextFormatter extends StringFormatter implements ContainerFacto
         '#attributes' => [
           'class' => ['edit-in-place-clickable', 'edit-in-place-clickable-init', $ajax_call_replace]
         ],
-        'base_render' => $render_elements,
-        'form_container' =>  $this->formBuilder->getForm('Drupal\edit_in_place_field\Form\EditInPlaceStringForm', [
+        'base_render' => [
+          '#theme' => 'edit_in_place_string_values',
+          '#multiple' => ($cardinality !== 1),
+          '#values' => array_column($field_values, 'value'),
+        ],
+        'form_container' =>  $this->formBuilder->getForm('Drupal\edit_in_place_field\Form\EditInPlaceLongStringForm', [
           'values' => $field_values,
           'cardinality' => $cardinality,
           'entity_type' => $items->getEntity()->getEntityTypeId(),

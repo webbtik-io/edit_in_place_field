@@ -102,7 +102,7 @@ class EditInPlaceReferenceWithParentForm extends EditInPlaceFieldReferenceForm {
     }
 
     // Render entities labels.
-    $labels_html = \Drupal::theme()->render('edit_in_place_reference_with_parent_label', [
+    $labels_html = $this->theme->render('edit_in_place_reference_with_parent_label', [
       'entities' => $selected_entities,
       'entity_type' => $data[self::VAR_ENTITY_TYPE],
       'field_name' => $field_name,

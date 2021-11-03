@@ -6,17 +6,17 @@ use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Entity\EntityStorageException;
 
 /**
- * Class EditInPlaceStringForm.
+ * Class EditInPlaceLongStringForm.
  *
  * @package Drupal\edit_in_place_field\Form
  */
-class EditInPlaceStringForm extends EditInPlaceFormBase {
+class EditInPlaceLongStringForm extends EditInPlaceFormBase {
 
   /**
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'edit_in_place_string_form';
+    return 'edit_in_place_long_string_form';
   }
 
   /**
@@ -27,7 +27,7 @@ class EditInPlaceStringForm extends EditInPlaceFormBase {
     if ($data['cardinality'] !== -1) {
       for($delta = 0; $delta < $data['cardinality']; $delta++) {
         $text_fields[] = [
-          '#type' => 'textfield',
+          '#type' => 'textarea',
           '#default_value' => isset($data['values'][$delta]) ? $data['values'][$delta]['value'] : '',
           '#name' => $data[self::VAR_FIELD_NAME].'[]',
           '#multiple' => TRUE
@@ -38,7 +38,7 @@ class EditInPlaceStringForm extends EditInPlaceFormBase {
       $delta = 0;
       while (isset($data['values'][$delta])) {
         $text_fields[] = [
-          '#type' => 'textfield',
+          '#type' => 'textarea',
           '#default_value' => $data['values'][$delta]['value'],
           '#name' => $data[self::VAR_FIELD_NAME].'[]',
           '#multiple' => TRUE
@@ -46,7 +46,7 @@ class EditInPlaceStringForm extends EditInPlaceFormBase {
         $delta++;
       }
       $text_fields[] = [
-        '#type' => 'textfield',
+        '#type' => 'textarea',
         '#default_value' => '',
         '#name' => $data[self::VAR_FIELD_NAME].'[]',
         '#multiple' => TRUE
