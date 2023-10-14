@@ -114,6 +114,7 @@ class EditInPlaceFieldReferenceFormatter extends EntityReferenceLabelFormatter i
       $ids = $storage->getQuery()
         ->condition($bundle_key, $bundles_type, 'IN')
         ->sort($label_key, 'ASC', $langcode)
+        ->accessCheck(TRUE)
         ->execute();
 
       $entities_list = $storage->loadMultiple($ids);
