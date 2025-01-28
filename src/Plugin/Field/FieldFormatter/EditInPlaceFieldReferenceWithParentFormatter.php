@@ -123,6 +123,7 @@ class EditInPlaceFieldReferenceWithParentFormatter extends EntityReferenceLabelF
         $ids = $storage->getQuery()
           ->condition('parent', $parent_id, '=')
           ->sort($label_key, 'ASC', $langcode)
+          ->accessCheck(TRUE)
           ->execute();
 
         $entities_list = $storage->loadMultiple($ids);
